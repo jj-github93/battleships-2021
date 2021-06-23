@@ -3,7 +3,7 @@ class BattleBoard:
     This class holds information on a 10x10 battleship grid.
     It also contains function handling attacks, ship placement and game status.
     """
-    # @D array for 10 by 10 grid to be played on
+    # 2D array for 10 by 10 grid to be played on
     board = [[".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
              [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
              [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
@@ -72,7 +72,7 @@ class BattleBoard:
         ship_orientation = input("Horizontal or Vertical: \n").upper()
 
         # Checks if the user entered an appropriate orientation
-        if ship_orientation[0] not in "HV":
+        if ship_orientation == "" or ship_orientation[0] not in "HV":
             print("Invalid orientation entered, try again")
             return False
 
@@ -169,6 +169,7 @@ class BattleBoard:
             # Catches invalid input
             except TypeError:
                 print("Invalid attack entered, try again.")
+                self.view_board()
                 continue
             else:
                 # Checks the entered grid has not been previously attacked
@@ -177,6 +178,7 @@ class BattleBoard:
                     return attack, (target_column, target_row)
                 else:
                     print("You've already attacked that grid. Try again.")
+                    self.view_board()
                     continue
 
     def record_attack(self, target, hit):
@@ -228,7 +230,10 @@ class BattleBoard:
             for j in i:
                 if j == "B":
                     print("Not defeated, continue")
-                    return True
+                    return False
         print("Defeated")
-        return False
+        return True
+
+
+
 

@@ -3,8 +3,7 @@ import threading
 import time
 from battleship_client import BattleshipClient
 
-from clients.development_client.app.game_handling import BattleBoard
-
+from game_handling import BattleBoard
 
 grpc_host = os.getenv('GRPC_HOST', 'localhost')
 grpc_port = os.getenv('GRPC_PORT', '50051')
@@ -64,28 +63,14 @@ def attack(vector):
     # print(f'Shot received at {vector}')
     attack_result = home_board.receive_attack(vector)
 
-    if home_board.check_defeat():
+    defeated = home_board.check_defeat()
+
+    if defeated:
         battleship.defeat()
     if attack_result:
         battleship.hit()
     else:
         battleship.miss()
-
-
-"""    while True:
-        print(H)it, m)iss, or d)efeat?)
-        s = input('Enter status> ')
-        if len(s):
-            _s = s[0].upper()
-            if _s == 'H':
-                battleship.hit()
-                break
-            elif _s == 'M':
-                battleship.miss()
-                break
-            elif _s == 'D':
-                battleship.defeat()
-                break"""
 
 
 target_coordinates = ()
