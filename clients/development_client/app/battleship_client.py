@@ -42,8 +42,8 @@ class BattleshipClient(ClientInterface):
         self.__player_id = ''
         self.__queue = queue.Queue()
 
-        self.__channel = grpc.insecure_channel(f'{self.__host}:{self.__port}')
-        self.__stub = BattleshipsStub(self.__channel)
+        self.__channel = None
+        self.__response_thread = None
 
     def __del__(self):
         if self.__channel is not None:
@@ -103,7 +103,14 @@ class BattleshipClient(ClientInterface):
 
         logger.info(f'New player: {self.__player_id}')
 
-        threading.Thread(target=self.__receive_responses, daemon=True).start()
+        self.__channel = grpc.insecure_channel(f'{self.__host}:{self.__port}')
+
+        stub = BattleshipsStub(self.__channel)
+        responses = stub.Game(self.__stream())
+        self.__response_thread = threading.Thread(
+            target=lambda: self.__receive_responses(responses))
+        self.__response_thread.daemon = True
+        self.__response_thread.start()
 
         # Everything's set up, so we can now join a game
         self.__send(Request(join=Request.Player(id=self.__player_id)))
@@ -160,14 +167,14 @@ class BattleshipClient(ClientInterface):
             else:
                 return
 
-    def __receive_responses(self):
+    def __receive_responses(self, in_stream):
         """Receive response from the gRPC in-channel.
-        """
-        responses = self.__stub.Game(self.__stream())
 
+        :param in_stream: input channel to handle
+        """
         while True:
             try:
-                response = next(responses)
+                response = next(in_stream)
 
                 logger.info(f'{self.__player_id} - Received {response}')
 
