@@ -2,7 +2,6 @@ import os
 import threading
 import time
 from battleship_client import BattleshipClient
-
 from game_handling import BattleBoard
 
 grpc_host = os.getenv('GRPC_HOST', 'localhost')
@@ -22,7 +21,7 @@ def begin():
 @battleship.on()
 def start_turn():
     global target_coordinates
-    target, target_coordinates = enemy_board.send_attack()
+    target, target_coordinates = game.send_attack()
     # print('Start turn')
     # s = input('Your move> ')
 
@@ -36,13 +35,13 @@ def end_turn():
 
 @battleship.on()
 def hit():
-    enemy_board.record_attack(target_coordinates, True)
+    game.record_attack(target_coordinates, True)
     # print('You hit the target!')
 
 
 @battleship.on()
 def miss():
-    enemy_board.record_attack(target_coordinates, False)
+    game.record_attack(target_coordinates, False)
     # print('Aww.. You missed!')
 
 
@@ -61,9 +60,9 @@ def lose():
 @battleship.on()
 def attack(vector):
     # print(f'Shot received at {vector}')
-    attack_result = home_board.receive_attack(vector)
+    attack_result = game.receive_attack(vector)
 
-    defeated = home_board.check_defeat()
+    defeated = game.check_defeat()
 
     if defeated:
         battleship.defeat()
@@ -75,10 +74,9 @@ def attack(vector):
 
 target_coordinates = ()
 
-home_board = BattleBoard()
-enemy_board = BattleBoard()
+game = BattleBoard()
 
-home_board.set_board()
+game.set_board()
 
 print('Waiting for the game to start...')
 

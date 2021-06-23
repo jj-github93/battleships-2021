@@ -4,16 +4,27 @@ class BattleBoard:
     It also contains function handling attacks, ship placement and game status.
     """
     # 2D array for 10 by 10 grid to be played on
-    board = [[".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
-             [".", ".", ".", ".", ".", ".", ".", ".", ".", "."]]
+    home_board = [[".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                  [".", ".", ".", ".", ".", ".", ".", ".", ".", "."]]
+
+    enemy_board = [[".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
+                   [".", ".", ".", ".", ".", ".", ".", ".", ".", "."]]
 
     # array that represents to total rows in the 10 x 10 grid
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -25,16 +36,19 @@ class BattleBoard:
         # dictionary of ships with names and length
         ships = {
             "Carrier": 5,
-            "Battleship": 4,
-            "Submarine(1)": 3,
-            "Submarine(2)": 3,
-            "Submarine(3)": 3,
-            "Cruiser": 3,
-            "Destroyer(1)": 2,
-            "Destroyer(2)": 2,
-            "Patrol(1)": 1,
-            "Patrol(2)": 1
+
         }
+
+        """     "Battleship": 4,
+        "Submarine(1)": 3,
+        "Submarine(2)": 3,
+        "Submarine(3)": 3,
+        "Cruiser": 3,
+        "Destroyer(1)": 2,
+        "Destroyer(2)": 2,
+        "Patrol(1)": 1,
+        "Patrol(2)": 1"""
+
         # Iterates through the dictionary to place ship into user assigned location
         for ship in ships:
             placed = False
@@ -54,11 +68,19 @@ class BattleBoard:
 
         print("All Ships placed successfully")
 
-    def view_board(self):
+    def view_home_board(self):
         """
-        Prints the board
+        Prints the home board
         """
-        for i in self.board:
+        for i in self.home_board:
+            print(i)
+
+    def view_enemy_board(self):
+        """
+        Prints the enemies board
+        """
+
+        for i in self.enemy_board:
             print(i)
 
     def check_placement(self, ship, ships):
@@ -106,25 +128,25 @@ class BattleBoard:
         if orientation == "H":
             # Checks if the grids are already filled from a ship
             for i in range(length):
-                if self.board[row][column + i] != ".":
+                if self.home_board[row][column + i] != ".":
                     print("Grid space already filled")
                     return False
             # Places the ship on the grid, ships assigned to 'B'
             if grid_free:
                 for grid in range(length):
-                    self.board[row][column + grid] = "B"
+                    self.home_board[row][column + grid] = "B"
                 print("Ship has been placed")
                 return True
         else:
             # Checks if the grids are already filled from a ship
             for i in range(length):
-                if self.board[row + i][column] != ".":
+                if self.home_board[row + i][column] != ".":
                     print("Grid space already filled")
                     return False
             # Places the ship on the grid, ships assigned to 'B'
             if grid_free:
                 for grid in range(length):
-                    self.board[row + grid][column] = "B"
+                    self.home_board[row + grid][column] = "B"
                 print("Ship has been placed")
                 return True
 
@@ -169,16 +191,16 @@ class BattleBoard:
             # Catches invalid input
             except TypeError:
                 print("Invalid attack entered, try again.")
-                self.view_board()
+                self.view_enemy_board()
                 continue
             else:
                 # Checks the entered grid has not been previously attacked
-                if self.board[target_row - 1][target_column - 1] == ".":
+                if self.enemy_board[target_row - 1][target_column - 1] == ".":
                     print("Sending attack to opponent.")
                     return attack, (target_column, target_row)
                 else:
                     print("You've already attacked that grid. Try again.")
-                    self.view_board()
+                    self.view_enemy_board()
                     continue
 
     def record_attack(self, target, hit):
@@ -187,10 +209,10 @@ class BattleBoard:
         """
         if hit:
             print("Successful attack, enemy hit")
-            self.board[target[1] - 1][target[0] - 1] = "X"
+            self.enemy_board[target[1] - 1][target[0] - 1] = "X"
         else:
             print("Your attack missed")
-            self.board[target[1] - 1][target[0] - 1] = "O"
+            self.enemy_board[target[1] - 1][target[0] - 1] = "O"
 
     def receive_attack(self, target):
         """
@@ -213,27 +235,23 @@ class BattleBoard:
             target_row = target_row - 1
             target_column = target_column - 1
             # Checks the user's board for a ship
-            if self.board[target_row][target_column] == "B":
+            if self.home_board[target_row][target_column] == "B":
                 print("Enemy attack successful.")
-                self.board[target_row][target_column] = "X"
+                self.home_board[target_row][target_column] = "X"
                 return True
             else:
-                self.board[target_row][target_column] = "O"
-                print("Enemy attack missed.")
+                self.home_board[target_row][target_column] = "O"
+                print("Enemy attacked missed.")
                 return False
 
     def check_defeat(self):
         """
             Checks whether the user has been defeated. All ships have been destroyed.
         """
-        for i in self.board:
+        for i in self.home_board:
             for j in i:
                 if j == "B":
                     print("Not defeated, continue")
                     return False
         print("Defeated")
         return True
-
-
-
-
