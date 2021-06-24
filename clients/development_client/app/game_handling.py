@@ -36,19 +36,17 @@ class BattleBoard:
         # dictionary of ships with names and length
         ships = {
             "Carrier": 5,
+            "Battleship": 4,
+            "Submarine(1)": 3,
+            "Submarine(2)": 3,
+            "Submarine(3)": 3,
+            "Cruiser": 3,
+            "Destroyer(1)": 2,
+            "Destroyer(2)": 2,
+            "Patrol(1)": 1,
+            "Patrol(2)": 1
 
         }
-
-        """     "Battleship": 4,
-        "Submarine(1)": 3,
-        "Submarine(2)": 3,
-        "Submarine(3)": 3,
-        "Cruiser": 3,
-        "Destroyer(1)": 2,
-        "Destroyer(2)": 2,
-        "Patrol(1)": 1,
-        "Patrol(2)": 1"""
-
         # Iterates through the dictionary to place ship into user assigned location
         for ship in ships:
             placed = False
@@ -59,7 +57,7 @@ class BattleBoard:
                     placed = False
                     view = input("Would you like to view your game board Y/N: \n").upper()
                     if view in ["Y", "YES"]:
-                        self.view_board()
+                        self.view_board(self.home_board)
                     else:
                         continue
                 if placed:
@@ -68,20 +66,16 @@ class BattleBoard:
 
         print("All Ships placed successfully")
 
-    def view_home_board(self):
+    def view_board(self, board):
         """
-        Prints the home board
+        Prints the parsed in 2D array representing the playing area.
         """
-        for i in self.home_board:
-            print(i)
-
-    def view_enemy_board(self):
-        """
-        Prints the enemies board
-        """
-
-        for i in self.enemy_board:
-            print(i)
+        print("[   ] [ A ][ B ][ C ][ D ][ E ][ F ][ G ][ H ][ I ][ J ]")
+        for i, row in enumerate(board):
+            if i > 8:
+                print(f"[ {i+1}]", row)
+            else:
+                print(f"[ {i + 1} ]", row)
 
     def check_placement(self, ship, ships):
         """
@@ -191,7 +185,7 @@ class BattleBoard:
             # Catches invalid input
             except TypeError:
                 print("Invalid attack entered, try again.")
-                self.view_enemy_board()
+                self.view_board(self.enemy_board)
                 continue
             else:
                 # Checks the entered grid has not been previously attacked
@@ -200,7 +194,7 @@ class BattleBoard:
                     return attack, (target_column, target_row)
                 else:
                     print("You've already attacked that grid. Try again.")
-                    self.view_enemy_board()
+                    self.view_board(self.enemy_board)
                     continue
 
     def record_attack(self, target, hit):
