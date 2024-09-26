@@ -2,9 +2,7 @@ import os
 import threading
 import time
 from battleship_client import BattleshipClient
-
-from clients.development_client.app.game_handling import BattleBoard
-
+from game_handling import BattleBoard
 
 grpc_host = os.getenv('GRPC_HOST', 'localhost')
 grpc_port = os.getenv('GRPC_PORT', '50051')
@@ -23,7 +21,7 @@ def begin():
 @battleship.on()
 def start_turn():
     global target_coordinates
-    target, target_coordinates = enemy_board.send_attack()
+    target, target_coordinates = game.send_attack()
     # print('Start turn')
     # s = input('Your move> ')
 
@@ -37,13 +35,13 @@ def end_turn():
 
 @battleship.on()
 def hit():
-    enemy_board.record_attack(target_coordinates, True)
+    game.record_attack(target_coordinates, True)
     # print('You hit the target!')
 
 
 @battleship.on()
 def miss():
-    enemy_board.record_attack(target_coordinates, False)
+    game.record_attack(target_coordinates, False)
     # print('Aww.. You missed!')
 
 
@@ -62,9 +60,11 @@ def lose():
 @battleship.on()
 def attack(vector):
     # print(f'Shot received at {vector}')
-    attack_result = home_board.receive_attack(vector)
+    attack_result = game.receive_attack(vector)
 
-    if home_board.check_defeat():
+    defeated = game.check_defeat()
+
+    if defeated:
         battleship.defeat()
     if attack_result:
         battleship.hit()
@@ -72,28 +72,11 @@ def attack(vector):
         battleship.miss()
 
 
-"""    while True:
-        print(H)it, m)iss, or d)efeat?)
-        s = input('Enter status> ')
-        if len(s):
-            _s = s[0].upper()
-            if _s == 'H':
-                battleship.hit()
-                break
-            elif _s == 'M':
-                battleship.miss()
-                break
-            elif _s == 'D':
-                battleship.defeat()
-                break"""
-
-
 target_coordinates = ()
 
-home_board = BattleBoard()
-enemy_board = BattleBoard()
+game = BattleBoard()
 
-home_board.set_board()
+game.set_board()
 
 print('Waiting for the game to start...')
 
